@@ -40,10 +40,10 @@
                 };
             });
             button.addEventListener('click', async function () {
-                consoel.log("scan");
-                let image_data_url = canvas.toDataURL('image/jpeg');
+                console.log("scan");
+                let image_data_url = canvas.toDataURL();
                 image.src = canvas.toDataURL();
-                const resultCanvas = scanner.extractPaper(image, paperWidth, paperHeight);
+                const resultCanvas = scanner.extractPaper(canvas, canvas.width, canvas.height);
                 alert(resultCanvas);
                 console.log(resultCanvas);
                 scanned.appendChild(resultCanvas);
