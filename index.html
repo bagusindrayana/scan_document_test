@@ -5,10 +5,11 @@
 </head>
 
 <body>
+    <!-- <select name="select" id="select"></select> -->
     <button id="button" type="button">Scan</button>
     <div id="scanned"></div>
     <br>
-    <img src="#" id="image" style="display: none;"/>
+    <img src="#" id="image" style="display: none;" />
     <br>
     <video id="video" style="display: none;"></video>
     <br>
@@ -24,10 +25,39 @@
     <script>
         //window onload
         window.addEventListener('load', function () {
+            // let selectedDeviceId = null;
+            // function gotDevices(mediaDevices) {
+            //     select.innerHTML = '';
+            //     select.appendChild(document.createElement('option'));
+            //     let count = 1;
+            //     if (selectedDeviceId == null) {
+            //         if (mediaDevices.length > 1) {
+            //             selectedDeviceId = mediaDevices[1].deviceId
+            //         } else {
+            //             selectedDeviceId = mediaDevices[0].deviceId
+            //         }
+            //     }
+            //     mediaDevices.forEach(mediaDevice => {
+            //         if (mediaDevice.kind === 'videoinput') {
+            //             const option = document.createElement('option');
+            //             option.value = mediaDevice.deviceId;
+            //             const label = mediaDevice.label || `Camera ${count++}`;
+            //             const textNode = document.createTextNode(label);
+            //             option.appendChild(textNode);
+            //             select.appendChild(option);
+            //         }
+            //     });
+            // }
             const scanner = new jscanify();
             const canvasCtx = canvas.getContext("2d");
             const resultCtx = result.getContext("2d");
-            navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            //navigator.mediaDevices.enumerateDevices().then(gotDevices);
+            navigator.mediaDevices.getUserMedia({
+                video: true, audio: false,
+                video: {
+                    facingMode: 'environment'
+                }
+            }).then((stream) => {
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
