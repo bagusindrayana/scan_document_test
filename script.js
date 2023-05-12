@@ -13,7 +13,7 @@ window.addEventListener('load', function () {
         // get window width
         w = window.innerWidth;
         // calculate canvas height
-        h = (w * 2) / 3;
+        h = (w * 3) / 2;
         // get video scaling ratio
         var ratio = h / stream_height;
         // recalculate video width
