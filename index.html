@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <title>Scan Document</title>
+</head>
+
+<body>
+    <button id="button" type="button">Scan</button>
+    <div id="scanned"></div>
+    <br>
+    <img src="#" id="image" />
+    <br>
+    <video id="video"></video>
+    <br>
+    <canvas id="canvas"></canvas>
+    <br>
+    <!-- original video -->
+    <canvas id="result"></canvas>
+    <br>
+    <!-- highlighted video -->
+    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
+    <!-- warning: loading OpenCV can take some time. Load asynchronously -->
+    <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
+    <script>
+        //window onload
+        window.addEventListener('load', function () {
+            const scanner = new jscanify();
+            const canvasCtx = canvas.getContext("2d");
+            const resultCtx = result.getContext("2d");
+            navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+
+                    setInterval(() => {
+                        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const resultCanvas = scanner.highlightPaper(canvas);
+                        resultCtx.drawImage(resultCanvas, 0, 0, canvas.width, canvas.height);
+                    }, 10);
+                };
+            });
+            button.addEventListener('click', async function () {
+                consoel.log("scan");
+                let image_data_url = canvas.toDataURL('image/jpeg');
+                image.src = canvas.toDataURL();
+                const resultCanvas = scanner.extractPaper(image, paperWidth, paperHeight);
+                alert(resultCanvas);
+                console.log(resultCanvas);
+                scanned.appendChild(resultCanvas);
+            });
+        }, false);
+    </script>
+</body>
+
+</html>
