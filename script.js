@@ -155,7 +155,7 @@ window.addEventListener('load', function () {
         var imgData = canvas.toDataURL("image/jpeg", 1.0);
         var pdf = new window.jsPDF;
       
-        pdf.addImage(imgData, 'JPEG', 0, 0);
+        pdf.addImage(imgData, 'JPEG', 0, 0,w,h);
         //filename with time
         const fileName = "scan_"+Date.now()+".pdf";
         pdf.save(fileName);
