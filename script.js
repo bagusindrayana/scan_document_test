@@ -62,6 +62,9 @@ window.addEventListener('load', function () {
             video.play();
 
             setInterval(() => {
+                if (pause) {
+                    return;
+                }
                 canvasCtx.drawImage(video, 0, 0, w, h);
                 const resultCanvas = scanner.highlightPaper(canvas);
                 resultCtx.drawImage(resultCanvas, 0, 0, w, h);
