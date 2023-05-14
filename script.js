@@ -1,8 +1,18 @@
 //window onload
 window.addEventListener('load', function () {
     if (!window.jsPDF ) {window.jsPDF = window.jspdf.jsPDF; };
-    console.log(jsPDF);
-    console.log(window.jsPDF);
+    const canvas = document.getElementById("canvas");
+    const result = document.getElementById("result");
+    const video = document.getElementById("video");
+    const scan = document.getElementById("scan");
+    const cancel = document.getElementById("cancel");
+    const save = document.getElementById("save");
+    const scanned = document.getElementById("scanned");
+    const after_scan = document.getElementById("after_scan");
+    const after_save = document.getElementById("after_save");
+    const download = document.getElementById("download");
+    const try_again = document.getElementById("try_again");
+    
     let pause = false;
     const scanner = new jscanify();
     const canvasCtx = canvas.getContext("2d");
@@ -151,8 +161,8 @@ window.addEventListener('load', function () {
     download.addEventListener("click", function() {
        
         //find canvas inside scanned
-        var canvas = scanned.querySelector("canvas");
-        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+        var _canvas = scanned.querySelector("canvas");
+        var imgData = _canvas.toDataURL("image/jpeg", 1.0);
         var pdf = new window.jsPDF;
       
         pdf.addImage(imgData, 'JPEG', 0, 0,w,h);
