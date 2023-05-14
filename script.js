@@ -114,15 +114,19 @@ window.addEventListener('load', function () {
         //let image_data_url = canvas.toDataURL();
         image.src = canvas.toDataURL();
         // const resultCanvas = scanner.extractPaper(canvas, stream_width, stream_height);
-        scanned.innerHTML = "";
-        scanned.appendChild(new_canvas);
-        scanned.style.display = "block";
+        
 
         let context = new_canvas.getContext("2d");
         new_canvas.onmousedown = canvasClick;
         new_canvas.onmouseup = stopDragging;
         new_canvas.onmouseout = stopDragging;
         new_canvas.onmousemove = dragCircle;
+
+        //for mobile
+        new_canvas.addEventListener("touchstart", canvasClick, false);
+        new_canvas.addEventListener("touchend", stopDragging, false);
+        new_canvas.addEventListener("touchcancel", stopDragging, false);
+        new_canvas.addEventListener("touchmove", dragCircle, false);
 
         scanner.points = [
             scanner.topLeftCorner,
@@ -131,9 +135,15 @@ window.addEventListener('load', function () {
             scanner.bottomLeftCorner
         ];
 
-        scanner.editablePrespectiveTransform(image, new_canvas);
-        after_scan.style.display = "block";
-        scan.style.display = "none";
+        setTimeout(() => {
+            scanner.editablePrespectiveTransform(image, new_canvas);
+            after_scan.style.display = "block";
+            scan.style.display = "none";
+
+            scanned.innerHTML = "";
+            scanned.appendChild(new_canvas);
+            scanned.style.display = "block";
+        }, 250);
     });
 
     cancel.addEventListener('click', async function () {
