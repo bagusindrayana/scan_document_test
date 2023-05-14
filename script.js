@@ -1,5 +1,9 @@
 //window onload
 window.addEventListener('load', function () {
+    if (!window.jsPDF ) {window.jsPDF = window.jspdf.jsPDF; };
+    console.log(jsPDF);
+    console.log(window.jsPDF);
+    let pause = false;
     const scanner = new jscanify();
     const canvasCtx = canvas.getContext("2d");
     const resultCtx = result.getContext("2d");
@@ -11,31 +15,26 @@ window.addEventListener('load', function () {
 
     function setup() {
         // get window width
-        w = window.innerWidth;
+        w = wrapper.offsetWidth;
+        resumeWebCam();
         // calculate canvas height
         h = (w * 3) / 2;
         // get video scaling ratio
         var ratio = h / stream_height;
         // recalculate video width
-        video_w  = stream_width * ratio;
+        video_w = stream_width * ratio;
         video_h = h;
+       
     }
 
-    //navigator.mediaDevices.enumerateDevices().then(gotDevices);
-    navigator.mediaDevices.getUserMedia({
-        video: true, audio: false,
-        video: {
-            facingMode: 'environment',
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        }
-    }).then((stream) => {
+    setup();
 
+    function startHighlight(stream) {
+        result.style.display = "block";
         let stream_settings = stream.getVideoTracks()[0].getSettings();
-        console.log(stream_settings);
         stream_width = stream_settings.width;
         stream_height = stream_settings.height;
-        setup();
+        
         canvas.width = w;
         canvas.height = h;
         result.width = w;
@@ -47,6 +46,9 @@ window.addEventListener('load', function () {
         // result.height = stream_height;
         video.srcObject = stream;
         video.onloadedmetadata = () => {
+            if (pause) {
+                return;
+            }
             video.play();
 
             setInterval(() => {
@@ -56,13 +58,144 @@ window.addEventListener('load', function () {
 
             }, 10);
         };
-    });
-    button.addEventListener('click', async function () {
+    }
+
+    
+
+    function pauseWebCam() {
+        pause = true;
+        stream = video.srcObject;
+        // now get all tracks
+        tracks = stream.getTracks();
+        // now close each track by having forEach loop
+        tracks.forEach(function (track) {
+            // stopping every track
+            track.stop();
+        });
+        // assign null to srcObject of video
+        video.srcObject = null;
+    }
+
+    function resumeWebCam() {
+        pause = false;
+        //navigator.mediaDevices.enumerateDevices().then(gotDevices);
+        navigator.mediaDevices.getUserMedia({
+            video: true, audio: false,
+            video: {
+                facingMode: 'environment',
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        }).then((stream) => {
+            startHighlight(stream);
+        });
+    }
+
+    scan.addEventListener('click', async function () {
+        result.style.display = "none";
+        pauseWebCam();
         console.log("scan");
-        // let image_data_url = canvas.toDataURL();
-        // image.src = canvas.toDataURL();
-        const resultCanvas = scanner.extractPaper(canvas, stream_width, stream_height);
+        const new_canvas = document.createElement("canvas");
+        new_canvas.width = w;
+        new_canvas.height = h;
+        //let image_data_url = canvas.toDataURL();
+        image.src = canvas.toDataURL();
+        // const resultCanvas = scanner.extractPaper(canvas, stream_width, stream_height);
+        scanned.innerHTML = "";
+        scanned.appendChild(new_canvas);
+        scanned.style.display = "block";
+
+        let context = new_canvas.getContext("2d");
+        new_canvas.onmousedown = canvasClick;
+        new_canvas.onmouseup = stopDragging;
+        new_canvas.onmouseout = stopDragging;
+        new_canvas.onmousemove = dragCircle;
+
+        scanner.points = [
+            scanner.topLeftCorner,
+            scanner.topRightCorner,
+            scanner.bottomRightCorner,
+            scanner.bottomLeftCorner
+        ];
+
+        scanner.editablePrespectiveTransform(image, new_canvas);
+        after_scan.style.display = "block";
+        scan.style.display = "none";
+    });
+
+    cancel.addEventListener('click', async function () {
+        scanned.innerHTML = "";
+        scanned.style.display = "none";
+        result.style.display = "block";
+        
+        resumeWebCam();
+
+        after_scan.style.display = "none";
+        scan.style.display = "inline-block";
+    });
+
+    save.addEventListener('click',function(){
+        const resultCanvas = scanner.extractPaper(canvas, stream_width, stream_height,{
+            topLeftCorner: scanner.points[0],
+            topRightCorner: scanner.points[1],
+            bottomRightCorner: scanner.points[2],
+            bottomLeftCorner: scanner.points[3]
+        });
         scanned.innerHTML = "";
         scanned.appendChild(resultCanvas);
+        scanned.style.display = "block";
+        after_scan.style.display = "none";
+        after_save.style.display = "block";
     });
+
+    download.addEventListener("click", function() {
+       
+        //find canvas inside scanned
+        var canvas = scanned.querySelector("canvas");
+        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+        var pdf = new window.jsPDF;
+      
+        pdf.addImage(imgData, 'JPEG', 0, 0);
+        //filename with time
+        const fileName = "scan_"+Date.now()+".pdf";
+        pdf.save(fileName);
+      }, false);
+
+    try_again.addEventListener('click',function(){
+        scanned.innerHTML = "";
+        scanned.style.display = "none";
+        scan.style.display = "inline-block";
+        after_scan.style.display = "none";
+        after_save.style.display = "none";
+        resumeWebCam();
+    });
+
+    function canvasClick(e) {
+        var x = e.pageX - e.target.offsetLeft;
+        var y = e.pageY - e.target.offsetTop;
+
+        for (var i = 0; i < scanner.points.length; i++) {
+
+            if (Math.pow(scanner.points[i].x - x, 2) + Math.pow(scanner.points[i].y - y, 2) < 400) {
+                scanner.points[i].selected = true;
+                console.log(scanner.points[i]);
+            } else {
+                if (scanner.points[i].selected) scanner.points[i].selected = false;
+            }
+        }
+    }
+    function dragCircle(e) {
+        if (scanner.points != null) {
+            for (var i = 0; i < scanner.points.length; i++) if (scanner.points[i].selected) {
+                scanner.points[i].x = e.pageX - e.target.offsetLeft;
+                scanner.points[i].y = e.pageY - e.target.offsetTop;
+            }
+        }
+        scanner.draw();
+    }
+    function stopDragging(e) {
+        for (var i = 0; i < scanner.points.length; i++) {
+            scanner.points[i].selected = false;
+        }
+    }
 }, false);

@@ -3,47 +3,40 @@
 <head>
     <title>Scan Document</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            margin: 0px;
-            padding: 0px;
-        }
-
-        #image {
-            width: 100%;
-            height: auto;
-        }
-
-        #scanned  {
-            width: 100%;
-            height: auto;
-        }
-
-        #scanned canvas  {
-            width: 100%;
-            height: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <!-- <select name="select" id="select"></select> -->
-    <button id="button" type="button">Scan</button>
-    <div id="scanned"></div>
-    <br>
-    <img src="#" id="image" style="display: none;" />
-    <br>
-    <video id="video" style="display: none;"></video>
-    <br>
-    <canvas id="canvas" style="display: none;"></canvas>
-    <br>
-    <!-- original video -->
-    <canvas id="result"></canvas>
-    <br>
+    <div id="wrapper">
+        <!-- <select name="select" id="select"></select> -->
+        
+        <div id="scanned"></div>
+        <img src="#" id="image" style="display: none;" />
+        <video id="video" style="display: none;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <!-- original video -->
+        <canvas id="result"></canvas>
+        
+    </div>
+    <div id="control">
+        <button id="scan" type="button">Scan</button>
+        <div id="after_scan">
+            
+            <button id="cancel" type="button">Cancel</button>
+            <button id="save" type="button">Save</button>
+        </div>
+        <div id="after_save">
+            <button id="try_again" type="button">Try Again</button>
+            <button id="download" type="button">Download</button>
+        </div>
+        
+    </div>
     <!-- highlighted video -->
     <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
     <!-- warning: loading OpenCV can take some time. Load asynchronously -->
-    <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script> -->
+    <script src="./jscanify.js"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
     <script src="./script.js"></script>
 </body>
 
