@@ -181,8 +181,8 @@
          * @param {*} cornerPoints optional custom corner points, in case automatic corner points are incorrect
          * @returns `HTMLCanvasElement` containing undistorted image
          */
-        extractPaper(image, resultWidth, resultHeight, cornerPoints) {
-            const canvas = document.createElement("canvas");
+        extractPaper(image, resultWidth, resultHeight, cornerPoints,myCanvas) {
+            const canvas = myCanvas || document.createElement("canvas");
 
             const img = cv.imread(image);
 
